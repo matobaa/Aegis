@@ -129,7 +129,7 @@ public class MainActivity extends AegisActivity implements EntryListView.Listene
         getOnBackPressedDispatcher().addCallback(this, _actionModeBackPressHandler);
 
         _entryListView = (EntryListView) getSupportFragmentManager().findFragmentById(R.id.key_profiles);
-        _entryListView.setListener(this);
+        _entryListView.addListener(this);
         _entryListView.setCodeGroupSize(_prefs.getCodeGroupSize());
         _entryListView.setShowAccountName(_prefs.isAccountNameVisible());
         _entryListView.setShowIcon(_prefs.isIconVisible());
@@ -173,7 +173,7 @@ public class MainActivity extends AegisActivity implements EntryListView.Listene
 
     @Override
     protected void onDestroy() {
-        _entryListView.setListener(null);
+        _entryListView.removeListener(null);
         super.onDestroy();
     }
 

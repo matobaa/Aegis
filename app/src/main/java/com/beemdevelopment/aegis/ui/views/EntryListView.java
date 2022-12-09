@@ -46,6 +46,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.divider.MaterialDividerItemDecoration;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -56,7 +57,7 @@ import java.util.stream.Collectors;
 
 public class EntryListView extends Fragment implements EntryAdapter.Listener {
     private EntryAdapter _adapter;
-    private Listener _listener;
+    private List<Listener> _listeners;
     private SimpleItemTouchHelperCallback _touchCallback;
     private ItemTouchHelper _touchHelper;
 
@@ -78,6 +79,7 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         _adapter = new EntryAdapter(this);
+        _listeners = new ArrayList<>(2);
         _showProgress = false;
     }
 
@@ -100,14 +102,14 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (_listener != null) {
+                for (Listener _listener: _listeners) {
                     _listener.onScroll(dx, dy);
                 }
             }
         });
 
         _recyclerView.setOnTouchListener((v, event) -> {
-            if (_listener != null) {
+            for(Listener _listener: _listeners) {
                 _listener.onEntryListTouch();
             }
             return false;
@@ -231,19 +233,23 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
         _adapter.refresh(hard);
     }
 
-    public void setListener(Listener listener) {
-        _listener = listener;
+    public void addListener(Listener listener) {
+        _listeners.add(listener);
+    }
+
+    public void removeListener(Listener listener) {
+        _listeners.remove(listener);
     }
 
     @Override
     public void onEntryClick(VaultEntry entry) {
-        if (_listener != null) {
+        for(Listener _listener: _listeners) {
             _listener.onEntryClick(entry);
         }
     }
 
     public boolean onLongEntryClick(VaultEntry entry) {
-        if (_listener != null) {
+        for(Listener _listener: _listeners) {
             _listener.onLongEntryClick(entry);
         }
         return true;
@@ -251,42 +257,42 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
 
     @Override
     public void onEntryMove(VaultEntry entry1, VaultEntry entry2) {
-        if (_listener != null) {
+        for(Listener _listener: _listeners) {
             _listener.onEntryMove(entry1, entry2);
         }
     }
 
     @Override
     public void onEntryDrop(VaultEntry entry) {
-        if (_listener != null) {
+        for(Listener _listener: _listeners) {
             _listener.onEntryDrop(entry);
         }
     }
 
     @Override
     public void onEntryChange(VaultEntry entry) {
-        if (_listener != null) {
+        for(Listener _listener: _listeners) {
             _listener.onEntryChange(entry);
         }
     }
 
     @Override
     public void onEntryCopy(VaultEntry entry) {
-        if (_listener != null) {
+        for(Listener _listener: _listeners) {
             _listener.onEntryCopy(entry);
         }
     }
 
     @Override
     public void onSelect(VaultEntry entry) {
-        if (_listener != null) {
+        for(Listener _listener: _listeners) {
             _listener.onSelect(entry);
         }
     }
 
     @Override
     public void onDeselect(VaultEntry entry) {
-        if (_listener != null) {
+        for(Listener _listener: _listeners) {
             _listener.onDeselect(entry);
         }
     }
@@ -308,7 +314,7 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
 
     @Override
     public void onListChange() {
-        if (_listener != null) {
+        for(Listener _listener: _listeners) {
             _listener.onListChange();
         }
     }
@@ -448,7 +454,7 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
         clearButton.setOnClickListener(v -> {
             chipGroup.clearCheck();
             List<String> groupFilter = Collections.emptyList();
-            if (_listener != null) {
+            for(Listener _listener: _listeners) {
                 _listener.onSaveGroupFilter(groupFilter);
             }
             setGroupFilter(groupFilter, true);
@@ -457,7 +463,7 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
 
         saveButton.setOnClickListener(v -> {
             List<String> groupFilter = getGroupFilter(chipGroup);
-            if (_listener != null) {
+            for(Listener _listener: _listeners) {
                 _listener.onSaveGroupFilter(groupFilter);
             }
             setGroupFilter(groupFilter, true);
